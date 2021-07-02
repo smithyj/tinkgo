@@ -2,8 +2,8 @@ package main
 
 import (
 	"gopkg.in/alecthomas/kingpin.v2"
-	"tinkgo/internal/app-api/pkg/core"
-	"tinkgo/internal/app-api/router"
+	"tinkgo/internal/app/api/pkg/core"
+	"tinkgo/internal/app/api/router"
 	"tinkgo/pkg/tinkgo/api"
 )
 

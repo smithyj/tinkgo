@@ -4,8 +4,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"tinkgo/internal/app/api/pkg/core"
 
-	"tinkgo/internal/app-api/pkg/core"
 	"tinkgo/pkg/tinkgo/api"
 )
 

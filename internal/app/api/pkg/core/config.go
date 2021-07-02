@@ -3,7 +3,7 @@ package core
 import (
 	"fmt"
 	"gopkg.in/yaml.v2"
-	"tinkgo/internal/app-api/assets"
+	"tinkgo/internal/app/api/assets"
 )
 
 type Config struct {

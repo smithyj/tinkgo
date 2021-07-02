@@ -1,9 +1,6 @@
 package core
 
-import "context"
-
 type Context struct {
-	context.Context
 	Config *Config
 }
 
