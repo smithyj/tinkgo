@@ -1,9 +1,9 @@
-package core
+package config
 
 import (
 	"fmt"
 	"gopkg.in/yaml.v2"
-	"tinkgo/internal/app/api/assets"
+	"tinkgo/service/app/api/internal/assets"
 )
 
 type Config struct {

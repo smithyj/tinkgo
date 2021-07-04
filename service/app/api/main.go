@@ -2,9 +2,10 @@ package main
 
 import (
 	"gopkg.in/alecthomas/kingpin.v2"
-	"tinkgo/internal/app/api/pkg/core"
-	"tinkgo/internal/app/api/router"
-	"tinkgo/pkg/tinkgo/api"
+	"tinkgo/pkg/tinkgo/httpx"
+	"tinkgo/service/app/api/internal/config"
+	"tinkgo/service/app/api/internal/handler"
+	"tinkgo/service/app/api/internal/svc"
 )
 
 var env = kingpin.Flag("env", "Set run environment, options: prod / test / dev").Default("dev").String()
@@ -15,23 +16,23 @@ func main()  {
 	kingpin.Parse()
 
 	// 全局配置
-	config, err := core.NewConfig(*env)
+	c, err := config.NewConfig(*env)
 	if err != nil {
 		panic(err)
 	}
 
 	// 上下文初始化
-	ctx, err := core.NewContext(config)
+	srvCtx, err := svc.NewServiceContext(c)
 	if err != nil {
 		panic(err)
 	}
 
 	// 服务初始化
-	server := api.NewServer(config.Mode)
+	server := httpx.NewServer(c.Mode)
 
 	// 路由初始化
-	router.NewRouter(server, ctx)
+	handler.NewRouter(server, srvCtx)
 
 	// 服务运行
-	server.GraceRun(config.Addr)
+	server.GraceRun(c.Addr)
 }
