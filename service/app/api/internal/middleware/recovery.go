@@ -7,7 +7,7 @@ import (
 	"tinkgo/service/pkg/errorx"
 )
 
-func ErrorMiddleware(svcCtx *svc.ServiceContext) gin.HandlerFunc {
+func Recovery(svcCtx *svc.ServiceContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {

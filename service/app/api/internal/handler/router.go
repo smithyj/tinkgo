@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"tinkgo/pkg/tinkgo/httpx"
 	"tinkgo/service/app/api/internal/handler/account"
 	"tinkgo/service/app/api/internal/handler/passport"
@@ -13,8 +14,9 @@ func NewRouter(server *httpx.Server, svcCtx *svc.ServiceContext) {
 	engine := server.Engine()
 	// 全局中间件
 	{
+		engine.Use(gin.Logger(), gin.Recovery())
 		engine.Use(cors.Default())
-		engine.Use(middleware.ErrorMiddleware(svcCtx))
+		engine.Use(middleware.Recovery(svcCtx))
 	}
 	// 通行证
 	{
