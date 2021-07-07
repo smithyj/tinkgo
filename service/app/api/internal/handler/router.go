@@ -14,7 +14,8 @@ func NewRouter(server *httpx.Server, svcCtx *svc.ServiceContext) {
 	engine := server.Engine()
 	// 全局中间件
 	{
-		engine.Use(gin.Logger(), gin.Recovery())
+		engine.Use(gin.Logger())
+		engine.Use(gin.Recovery())
 		engine.Use(cors.Default())
 		engine.Use(middleware.Recovery(svcCtx))
 	}

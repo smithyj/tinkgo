@@ -2,6 +2,7 @@ package errorx
 
 import (
 	"fmt"
+	"io"
 	"tinkgo/service/pkg/codex"
 )
 
@@ -24,7 +25,7 @@ func NewCodeErrorWithCode(code int) error {
 
 func NewCodeErrorWithMsg(msg string) error {
 	code := codex.Error
-	if msg == "" {
+	if msg == "" || msg == io.EOF.Error() {
 		msg = codex.Msg(code)
 	}
 	return &CodeError{
