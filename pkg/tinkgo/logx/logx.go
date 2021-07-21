@@ -37,11 +37,8 @@ func Setup(c Config) {
 		_ = level.UnmarshalText([]byte(c.Level))
 	}
 	var cores []zapcore.Core
-	cores = append(cores, zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderConfig),
-		zapcore.AddSync(syncer),
-		level,
-	))
+	var ws []zapcore.WriteSyncer
+	ws = append(ws, zapcore.AddSync(syncer))
 	if c.Debug {
 		level = zap.DebugLevel
 		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
@@ -50,7 +47,16 @@ func Setup(c Config) {
 			zapcore.AddSync(os.Stdout),
 			level,
 		))
+	} else {
+		// 非 DEBUG 模式，输出 JSON
+		ws = append(ws, zapcore.AddSync(os.Stdout))
 	}
+
+	cores = append(cores, zapcore.NewCore(
+		zapcore.NewJSONEncoder(encoderConfig),
+		zapcore.NewMultiWriteSyncer(ws...),
+		level,
+	))
 
 	logger = zap.New(
 		zapcore.NewTee(cores...),

@@ -1,8 +1,3 @@
 Name: tinkgo
 Mode: debug
 Addr: :8080
-LogConfig:
-  Name: tinkgo
-  Debug: true
-  Level: info
-  Path: ./logs
