@@ -5,9 +5,9 @@ import (
 	"tinkgo/service/app/api/internal/svc"
 )
 
-type RegisterRequest struct {}
+type RegisterRequest struct{}
 
-type RegisterResponse struct {}
+type RegisterResponse struct{}
 
 type RegisterLogic struct {
 	ctx    context.Context

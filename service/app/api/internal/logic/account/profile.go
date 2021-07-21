@@ -5,9 +5,9 @@ import (
 	"tinkgo/service/app/api/internal/svc"
 )
 
-type ProfileRequest struct {}
+type ProfileRequest struct{}
 
-type ProfileResponse struct {}
+type ProfileResponse struct{}
 
 type ProfileLogic struct {
 	ctx    context.Context

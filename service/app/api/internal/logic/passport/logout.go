@@ -5,9 +5,9 @@ import (
 	"tinkgo/service/app/api/internal/svc"
 )
 
-type LogoutRequest struct {}
+type LogoutRequest struct{}
 
-type LogoutResponse struct {}
+type LogoutResponse struct{}
 
 type LogoutLogic struct {
 	ctx    context.Context

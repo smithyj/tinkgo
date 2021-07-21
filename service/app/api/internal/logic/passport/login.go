@@ -6,9 +6,9 @@ import (
 	"tinkgo/service/app/api/internal/svc"
 )
 
-type LoginRequest struct {}
+type LoginRequest struct{}
 
-type LoginResponse struct {}
+type LoginResponse struct{}
 
 type LoginLogic struct {
 	ctx    context.Context
