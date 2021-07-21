@@ -3,6 +3,7 @@ package main
 import (
 	"gopkg.in/alecthomas/kingpin.v2"
 	"tinkgo/pkg/tinkgo/httpx"
+	"tinkgo/pkg/tinkgo/logx"
 	"tinkgo/service/app/api/internal/config"
 	"tinkgo/service/app/api/internal/handler"
 	"tinkgo/service/app/api/internal/svc"
@@ -10,7 +11,7 @@ import (
 
 var env = kingpin.Flag("env", "Set run environment, options: prod / test / dev").Default("dev").String()
 
-func main()  {
+func main() {
 	// 命令行解析
 	kingpin.Version("1.0.0")
 	kingpin.Parse()
@@ -20,6 +21,10 @@ func main()  {
 	if err != nil {
 		panic(err)
 	}
+
+	// 日志初始化
+	logx.Setup(c.LogConfig)
+	defer logx.Sync()
 
 	// 上下文初始化
 	srvCtx, err := svc.NewServiceContext(c)

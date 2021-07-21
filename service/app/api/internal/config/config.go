@@ -3,13 +3,15 @@ package config
 import (
 	"fmt"
 	"gopkg.in/yaml.v2"
+	"tinkgo/pkg/tinkgo/logx"
 	"tinkgo/service/app/api/internal/assets"
 )
 
 type Config struct {
-	Name string `yaml:"Name"`
-	Mode string `yaml:"Mode"`
-	Addr string `yaml:"Addr"`
+	Name      string      `yaml:"Name"`
+	Mode      string      `yaml:"Mode"`
+	Addr      string      `yaml:"Addr"`
+	LogConfig logx.Config `yaml:"LogConfig"`
 }
 
 func NewConfig(env string) (config *Config, err error) {
