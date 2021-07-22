@@ -40,6 +40,7 @@ func Setup(c Config) {
 	var ws []zapcore.WriteSyncer
 	ws = append(ws, zapcore.AddSync(syncer))
 	if c.Debug {
+		// debug 模式，增加 console 输出
 		level = zap.DebugLevel
 		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 		cores = append(cores, zapcore.NewCore(
