@@ -28,6 +28,7 @@ func Logger(srvCtx *svc.ServiceContext) gin.HandlerFunc {
 			zap.String("proto", c.Request.Proto),
 			zap.String("status", fmt.Sprintf("%v", c.Writer.Status())),
 			zap.String("duration", time.Now().Sub(start).String()),
+			zap.String("user-agent", c.Request.UserAgent()),
 		)
 	}
 }

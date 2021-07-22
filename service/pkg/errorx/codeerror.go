@@ -12,7 +12,7 @@ type CodeError struct {
 	Data interface{} `json:"data,omitempty"`
 }
 
-func NewCodeErrorWithCode(code int) error {
+func WithCode(code int) error {
 	if code == 0 {
 		code = codex.Error
 	}
@@ -23,7 +23,7 @@ func NewCodeErrorWithCode(code int) error {
 	}
 }
 
-func NewCodeErrorWithMsg(msg string) error {
+func WithMsg(msg string) error {
 	code := codex.Error
 	if msg == "" || msg == io.EOF.Error() {
 		msg = codex.Msg(code)
@@ -34,7 +34,7 @@ func NewCodeErrorWithMsg(msg string) error {
 	}
 }
 
-func NewCodeErrorWithData(data interface{}) error {
+func WithData(data interface{}) error {
 	code := codex.Error
 	msg := codex.Msg(code)
 	return &CodeError{

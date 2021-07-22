@@ -16,7 +16,7 @@ func Recovery(svcCtx *svc.ServiceContext) gin.HandlerFunc {
 					c.JSON(http.StatusOK, err)
 				default:
 					e := err.(error)
-					c.JSON(http.StatusInternalServerError, errorx.NewCodeErrorWithMsg(e.Error()))
+					c.JSON(http.StatusInternalServerError, errorx.WithMsg(e.Error()))
 				}
 			}
 		}()
