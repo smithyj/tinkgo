@@ -2,8 +2,8 @@ package passport
 
 import (
 	"context"
-	"errors"
 	"tinkgo/service/app/api/internal/svc"
+	"tinkgo/service/pkg/errorx"
 )
 
 type LoginRequest struct{}
@@ -23,5 +23,5 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (logic *LoginLogic) Login(req *LoginRequest) (*LoginResponse, error) {
-	return &LoginResponse{}, errors.New("dsfsdafsf")
+	return &LoginResponse{}, errorx.WithMsg("我也不知道你干嘛了")
 }
