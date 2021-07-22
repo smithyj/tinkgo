@@ -1,6 +1,7 @@
 package account
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"tinkgo/service/app/api/internal/logic/account"
@@ -11,14 +12,12 @@ func ProfileHandler(svcCtx *svc.ServiceContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req account.ProfileRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			_ = c.Error(err)
-			return
+			panic(err)
 		}
-		l := account.NewProfileLogic(c, svcCtx)
+		l := account.NewProfileLogic(context.TODO(), svcCtx)
 		resp, err := l.Profile(&req)
 		if err != nil {
-			c.Error(err)
-			return
+			panic(err)
 		}
 		c.JSON(http.StatusOK, resp)
 	}

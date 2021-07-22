@@ -1,6 +1,7 @@
 package passport
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"tinkgo/service/app/api/internal/logic/passport"
@@ -13,7 +14,7 @@ func LogoutHandler(svcCtx *svc.ServiceContext) gin.HandlerFunc {
 		if err := c.ShouldBindJSON(&req); err != nil {
 			panic(err)
 		}
-		l := passport.NewLogoutLogic(c, svcCtx)
+		l := passport.NewLogoutLogic(context.TODO(), svcCtx)
 		resp, err := l.Logout(&req)
 		if err != nil {
 			panic(err)

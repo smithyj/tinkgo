@@ -1,6 +1,7 @@
 package account
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"tinkgo/service/app/api/internal/logic/account"
@@ -13,7 +14,7 @@ func UpdateProfileHandler(svcCtx *svc.ServiceContext) gin.HandlerFunc {
 		if err := c.ShouldBindJSON(&req); err != nil {
 			panic(err)
 		}
-		l := account.NewUpdateProfileLogic(c, svcCtx)
+		l := account.NewUpdateProfileLogic(context.TODO(), svcCtx)
 		resp, err := l.UpdateProfile(&req)
 		if err != nil {
 			panic(err)
