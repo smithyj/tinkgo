@@ -30,7 +30,7 @@ func Setup(c Config) {
 	syncer := zapcore.AddSync(&hook)
 
 	encoderConfig := zap.NewProductionEncoderConfig()
-	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	encoderConfig.EncodeTime = zapcore.RFC3339NanoTimeEncoder
 
 	level := zap.InfoLevel
 	if c.Level != "" {
@@ -64,8 +64,9 @@ func Setup(c Config) {
 			return lvl >= zap.ErrorLevel
 		})),
 		zap.AddCaller(),
-		zap.AddCallerSkip(1),
 	)
+
+	logger = logger.With(zap.String("project", c.Name))
 
 	zap.ReplaceGlobals(logger)
 	zap.RedirectStdLog(logger)
