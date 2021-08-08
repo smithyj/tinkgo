@@ -9,6 +9,18 @@ import (
 	"tinkgo/service/app/api/internal/svc"
 )
 
+func ignoreCheck(str string) bool {
+	whites := []string{
+		"/favicon.ico",
+	}
+	for _, v := range whites {
+		if v == str {
+			return true
+		}
+	}
+	return false
+}
+
 func Logger(srvCtx *svc.ServiceContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		startAt := time.Now()
@@ -27,17 +39,19 @@ func Logger(srvCtx *svc.ServiceContext) gin.HandlerFunc {
 
 		endAt := time.Now()
 
-		zap.L().WithOptions(zap.WithCaller(false)).Info(
-			"request",
-			zap.String(tracex.TracingKey, t.TraceId()),
-			zap.String("request_id", t.RequestId()),
-			zap.String("host", c.Request.RemoteAddr),
-			zap.String("method", c.Request.Method),
-			zap.String("uri", c.Request.RequestURI),
-			zap.String("proto", c.Request.Proto),
-			zap.String("status", fmt.Sprintf("%v", c.Writer.Status())),
-			zap.Duration("duration", endAt.Sub(startAt)),
-			zap.String("user-agent", c.Request.UserAgent()),
-		)
+		if !ignoreCheck(c.Request.RequestURI) {
+			zap.L().WithOptions(zap.WithCaller(false)).Info(
+				"[REQUEST]",
+				zap.String(tracex.TracingKey, t.TraceId()),
+				zap.String("request_id", t.RequestId()),
+				zap.String("host", c.Request.RemoteAddr),
+				zap.String("method", c.Request.Method),
+				zap.String("uri", c.Request.RequestURI),
+				zap.String("proto", c.Request.Proto),
+				zap.String("status", fmt.Sprintf("%v", c.Writer.Status())),
+				zap.Duration("duration", endAt.Sub(startAt)),
+				zap.String("user-agent", c.Request.UserAgent()),
+			)
+		}
 	}
 }
