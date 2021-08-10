@@ -17,34 +17,26 @@ func main() {
 	kingpin.Parse()
 
 	// 全局配置
-	c, err := config.NewConfig(*env)
+	conf, err := config.NewConfig(*env)
 	if err != nil {
 		panic(err)
 	}
 
 	// 日志初始化
-	logx.Setup(c.LogConfig)
-
-	logx.Debug().Msg("1")
-	logx.Info().Msg("2")
-	logx.Warn().Msg("3")
-	logx.Error().Msg("4")
-	logx.Trace().Msg("5")
-	logx.Fatal().Msg("6")
-	logx.Panic().Msg("7")
+	logx.Setup(conf.LogConfig)
 
 	// 上下文初始化
-	srvCtx, err := svc.NewServiceContext(c)
+	srvCtx, err := svc.NewServiceContext(conf)
 	if err != nil {
 		panic(err)
 	}
 
 	// 服务初始化
-	server := httpx.NewServer(c.Mode)
+	server := httpx.NewServer(conf.Mode)
 
 	// 路由初始化
 	handler.NewRouter(server, srvCtx)
 
 	// 服务运行
-	server.GraceRun(c.Addr)
+	server.GraceRun(conf.Addr)
 }

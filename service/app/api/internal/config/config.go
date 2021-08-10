@@ -23,5 +23,8 @@ func NewConfig(env string) (config *Config, err error) {
 	if err = yaml.Unmarshal(out, &config); err != nil {
 		return
 	}
+	if config.Mode == "debug" {
+		config.LogConfig.Debug = true
+	}
 	return
 }

@@ -2,76 +2,99 @@ package logx
 
 import (
 	"fmt"
-	"github.com/rs/zerolog"
-	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var event = map[zerolog.Level]*zerolog.Event {}
+var logs = map[zerolog.Level]zerolog.Logger{}
 
 func Debug() *zerolog.Event {
-	return event[zerolog.DebugLevel]
+	l, ok := logs[zerolog.DebugLevel]
+	if !ok {
+		return log.Debug()
+	}
+	l = l.With().Timestamp().Caller().Stack().Logger()
+	return l.Debug()
 }
 
 func Info() *zerolog.Event {
-	return event[zerolog.InfoLevel]
+	l, ok := logs[zerolog.InfoLevel]
+	if !ok {
+		return log.Debug()
+	}
+	l = l.With().Timestamp().Logger()
+	return l.Info()
 }
 
 func Warn() *zerolog.Event {
-	return event[zerolog.WarnLevel]
+	l, ok := logs[zerolog.WarnLevel]
+	if !ok {
+		return log.Debug()
+	}
+	l = l.With().Timestamp().Caller().Logger()
+	return l.Warn()
 }
 
 func Error() *zerolog.Event {
-	return event[zerolog.ErrorLevel]
+	l, ok := logs[zerolog.ErrorLevel]
+	if !ok {
+		return log.Debug()
+	}
+	l = l.With().Timestamp().Caller().Stack().Logger()
+	return l.Error()
 }
 
 func Fatal() *zerolog.Event {
-	return event[zerolog.FatalLevel]
+	l, ok := logs[zerolog.FatalLevel]
+	if !ok {
+		return log.Debug()
+	}
+	l = l.With().Timestamp().Caller().Stack().Logger()
+	return l.Fatal()
 }
 
 func Panic() *zerolog.Event {
-	return event[zerolog.PanicLevel]
+	l, ok := logs[zerolog.PanicLevel]
+	if !ok {
+		return log.Debug()
+	}
+	l = l.With().Timestamp().Caller().Stack().Logger()
+	return l.Panic()
 }
 
 func Trace() *zerolog.Event {
-	return event[zerolog.TraceLevel]
+	l, ok := logs[zerolog.TraceLevel]
+	if !ok {
+		return log.Debug()
+	}
+	l = l.With().Timestamp().Logger()
+	return l.Trace()
 }
 
 func Setup(config Config) {
+	zerolog.TimestampFieldName = "time"
 	if config.Path == "" {
 		config.Path = "./logs"
 	}
-	level := map[zerolog.Level]func(logger zerolog.Logger)*zerolog.Event{
-		zerolog.DebugLevel: func(logger zerolog.Logger) *zerolog.Event {
-			return logger.Debug()
-		},
-		zerolog.InfoLevel: func(logger zerolog.Logger) *zerolog.Event {
-			return logger.Info()
-		},
-		zerolog.WarnLevel: func(logger zerolog.Logger) *zerolog.Event {
-			return logger.Warn()
-		},
-		zerolog.ErrorLevel: func(logger zerolog.Logger) *zerolog.Event {
-			return logger.Error()
-		},
-		zerolog.FatalLevel: func(logger zerolog.Logger) *zerolog.Event {
-			return logger.Fatal()
-		},
-		zerolog.PanicLevel: func(logger zerolog.Logger) *zerolog.Event {
-			return logger.Panic()
-		},
-		zerolog.TraceLevel: func(logger zerolog.Logger) *zerolog.Event {
-			return logger.Trace()
-		},
+	levels := []zerolog.Level{
+		zerolog.DebugLevel,
+		zerolog.InfoLevel,
+		zerolog.WarnLevel,
+		zerolog.ErrorLevel,
+		zerolog.FatalLevel,
+		zerolog.PanicLevel,
+		zerolog.TraceLevel,
 	}
 
-	if config.Debug {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	}
-
-	for k, l := range level {
+	for _, level := range levels {
+		if !config.Debug && level == zerolog.DebugLevel {
+			level = zerolog.Disabled
+		}
 		hook := lumberjack.Logger{
-			Filename:   fmt.Sprintf("%s/%s.log", config.Path, zerolog.LevelFieldMarshalFunc(k)),
+			Filename:   fmt.Sprintf("%s/%s.log", config.Path, zerolog.LevelFieldMarshalFunc(level)),
 			MaxSize:    config.MaxSize,
 			MaxAge:     config.MaxAge,
 			MaxBackups: config.MaxBackups,
@@ -81,7 +104,6 @@ func Setup(config Config) {
 			os.Stdout,
 			&hook,
 		)
-		logger := zerolog.New(writer)
-		event[k] = l(logger)
+		logs[level] = zerolog.New(writer)
 	}
 }
