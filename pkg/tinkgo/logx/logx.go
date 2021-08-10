@@ -2,79 +2,86 @@ package logx
 
 import (
 	"fmt"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"github.com/rs/zerolog"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
 )
 
-var (
-	logger *zap.Logger
-)
+var event = map[zerolog.Level]*zerolog.Event {}
 
-func Setup(c Config) {
-	if c.Path == "" {
-		c.Path = "./logs"
-	}
-	if c.Name == "" {
-		c.Name = "app"
-	}
-	hook := lumberjack.Logger{
-		Filename:   fmt.Sprintf("%s/%s.log", c.Path, c.Name),
-		MaxSize:    c.MaxSize,
-		MaxAge:     c.MaxAge,
-		MaxBackups: c.MaxBackups,
-		Compress:   c.Compress,
-	}
-
-	syncer := zapcore.AddSync(&hook)
-
-	encoderConfig := zap.NewProductionEncoderConfig()
-	encoderConfig.EncodeTime = zapcore.RFC3339NanoTimeEncoder
-
-	level := zap.InfoLevel
-	if c.Level != "" {
-		_ = level.UnmarshalText([]byte(c.Level))
-	}
-	var cores []zapcore.Core
-	var ws []zapcore.WriteSyncer
-	ws = append(ws, zapcore.AddSync(syncer))
-	if c.Debug {
-		// debug 模式，增加 console 输出
-		level = zap.DebugLevel
-		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-		cores = append(cores, zapcore.NewCore(
-			zapcore.NewConsoleEncoder(encoderConfig),
-			zapcore.AddSync(os.Stdout),
-			level,
-		))
-	} else {
-		// 非 DEBUG 模式，输出 JSON
-		ws = append(ws, zapcore.AddSync(os.Stdout))
-	}
-
-	cores = append(cores, zapcore.NewCore(
-		zapcore.NewJSONEncoder(encoderConfig),
-		zapcore.NewMultiWriteSyncer(ws...),
-		level,
-	))
-
-	logger = zap.New(
-		zapcore.NewTee(cores...),
-		zap.AddStacktrace(zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-			return lvl >= zap.ErrorLevel
-		})),
-		zap.AddCaller(),
-	)
-
-	logger = logger.With(zap.String("project", c.Name))
-
-	zap.ReplaceGlobals(logger)
-	zap.RedirectStdLog(logger)
+func Debug() *zerolog.Event {
+	return event[zerolog.DebugLevel]
 }
 
-func Sync() {
-	defer func() {
-		_ = logger.Sync()
-	}()
+func Info() *zerolog.Event {
+	return event[zerolog.InfoLevel]
+}
+
+func Warn() *zerolog.Event {
+	return event[zerolog.WarnLevel]
+}
+
+func Error() *zerolog.Event {
+	return event[zerolog.ErrorLevel]
+}
+
+func Fatal() *zerolog.Event {
+	return event[zerolog.FatalLevel]
+}
+
+func Panic() *zerolog.Event {
+	return event[zerolog.PanicLevel]
+}
+
+func Trace() *zerolog.Event {
+	return event[zerolog.TraceLevel]
+}
+
+func Setup(config Config) {
+	if config.Path == "" {
+		config.Path = "./logs"
+	}
+	level := map[zerolog.Level]func(logger zerolog.Logger)*zerolog.Event{
+		zerolog.DebugLevel: func(logger zerolog.Logger) *zerolog.Event {
+			return logger.Debug()
+		},
+		zerolog.InfoLevel: func(logger zerolog.Logger) *zerolog.Event {
+			return logger.Info()
+		},
+		zerolog.WarnLevel: func(logger zerolog.Logger) *zerolog.Event {
+			return logger.Warn()
+		},
+		zerolog.ErrorLevel: func(logger zerolog.Logger) *zerolog.Event {
+			return logger.Error()
+		},
+		zerolog.FatalLevel: func(logger zerolog.Logger) *zerolog.Event {
+			return logger.Fatal()
+		},
+		zerolog.PanicLevel: func(logger zerolog.Logger) *zerolog.Event {
+			return logger.Panic()
+		},
+		zerolog.TraceLevel: func(logger zerolog.Logger) *zerolog.Event {
+			return logger.Trace()
+		},
+	}
+
+	if config.Debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+
+	for k, l := range level {
+		hook := lumberjack.Logger{
+			Filename:   fmt.Sprintf("%s/%s.log", config.Path, zerolog.LevelFieldMarshalFunc(k)),
+			MaxSize:    config.MaxSize,
+			MaxAge:     config.MaxAge,
+			MaxBackups: config.MaxBackups,
+			Compress:   config.Compress,
+		}
+		writer := zerolog.MultiLevelWriter(
+			os.Stdout,
+			&hook,
+		)
+		logger := zerolog.New(writer)
+		event[k] = l(logger)
+	}
 }

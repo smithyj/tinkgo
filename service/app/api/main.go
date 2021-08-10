@@ -24,7 +24,14 @@ func main() {
 
 	// 日志初始化
 	logx.Setup(c.LogConfig)
-	defer logx.Sync()
+
+	logx.Debug().Msg("1")
+	logx.Info().Msg("2")
+	logx.Warn().Msg("3")
+	logx.Error().Msg("4")
+	logx.Trace().Msg("5")
+	logx.Fatal().Msg("6")
+	logx.Panic().Msg("7")
 
 	// 上下文初始化
 	srvCtx, err := svc.NewServiceContext(c)
